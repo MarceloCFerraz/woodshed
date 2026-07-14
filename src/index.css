@@ -1,0 +1,45 @@
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/work-sans';
+@import '@fontsource-variable/jetbrains-mono';
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Practice-room palette: aged maple + brass in the light, warm amp lacquer + tube glow in the dark. */
+  --color-maple: #ede2c8;
+  --color-parchment: #f6efdd;
+  --color-walnut: #2a2013;
+  --color-walnut-soft: #6f5d42;
+  --color-lacquer: #16110c;
+  --color-lacquer-panel: #211a12;
+  --color-bone: #ece0c8;
+  --color-bone-soft: #a39070;
+  --color-brass: #8a5f12;
+  --color-brass-bright: #cf9a3a;
+  --color-glow: #e8a13d;
+
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-sans: 'Work Sans Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-maple);
+    color-scheme: light;
+  }
+  html.dark {
+    background-color: var(--color-lacquer);
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
