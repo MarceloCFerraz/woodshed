@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-13 — History shows subdivision; softer subdivision click
+
+Two enhancements requested by Marcelo after playing with the accented clicks:
+
+- **History entries now record and display the subdivision** the segment was played with (glyph in the row with a tooltip/sr-only label, `note_value` column in the CSV). `HistoryEntry.noteValue` is optional — entries logged before this change fall back to quarter on display and export. Consequence: changing the subdivision mid-run now splits the segment exactly like a BPM change (`useSession.switchBpm` became `switchSettings(bpm, noteValue)`), otherwise a row could claim a subdivision it wasn't fully played at. Note-value label/flag metadata was centralized in `NOTE_VALUE_META` (`src/components/NoteGlyph.tsx`), shared by the selector and the history list.
+- **Subdivision click dropped further**: 1100 Hz → 850 Hz and 45% → 28% gain (`src/lib/metronome.ts`), so the off-beat ticks sit clearly under the 1800 Hz beat.
+- **CSV export filename gets a local-time timestamp suffix** (`woodshed-history-2026-07-13-22-17-32.csv`) so repeated exports don't overwrite each other (`csvFilename` in `src/lib/csv.ts`).
+
 ## 2026-07-13 — Accented beat clicks
 
 Subdivision clicks now sound distinct from the beat: the on-beat click keeps the bright 1800 Hz tone at full gain, while subdivision clicks play at 1100 Hz and 45% gain (`BEAT_FREQ_HZ` / `SUBDIVISION_FREQ_HZ` in `src/lib/metronome.ts`). Requested by Marcelo after trying the first build — with a uniform click you can't hear where the beat falls when subdividing.

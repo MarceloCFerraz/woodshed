@@ -6,6 +6,7 @@ import { TapTempo } from './components/TapTempo'
 import { ThemeToggle } from './components/ThemeToggle'
 import { Transport } from './components/Transport'
 import { useMetronome } from './hooks/useMetronome'
+import type { NoteValue } from './lib/metronome'
 import { useSession } from './hooks/useSession'
 import { useTheme } from './hooks/useTheme'
 
@@ -38,13 +39,18 @@ function App() {
       setBeatOn(false)
     } else {
       metronome.start()
-      session.start(metronome.bpm)
+      session.start(metronome.bpm, metronome.noteValue)
     }
   }
 
   const handleBpmChange = (value: number) => {
     const clamped = metronome.setBpm(value)
-    session.switchBpm(clamped)
+    session.switchSettings(clamped, metronome.noteValue)
+  }
+
+  const handleNoteValueChange = (value: NoteValue) => {
+    metronome.setNoteValue(value)
+    session.switchSettings(metronome.bpm, value)
   }
 
   return (
@@ -64,7 +70,7 @@ function App() {
           <BpmControl bpm={metronome.bpm} onChange={handleBpmChange} />
 
           <div className="flex flex-wrap items-stretch justify-center gap-3">
-            <NoteValueSelector value={metronome.noteValue} onChange={metronome.setNoteValue} />
+            <NoteValueSelector value={metronome.noteValue} onChange={handleNoteValueChange} />
             <TapTempo onBpm={handleBpmChange} />
           </div>
 

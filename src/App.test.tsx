@@ -67,6 +67,31 @@ describe('App', () => {
     expect(history).toHaveTextContent('0:45')
   })
 
+  it('logs the subdivision the session was played with', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: 'Sixteenth' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+    vi.advanceTimersByTime(45_000)
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    const row = screen.getByRole('listitem')
+    expect(row).toHaveTextContent('Sixteenth notes')
+  })
+
+  it('splits the log when the subdivision changes mid-session', () => {
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+    vi.advanceTimersByTime(60_000)
+    fireEvent.click(screen.getByRole('button', { name: 'Eighth' }))
+    vi.advanceTimersByTime(40_000)
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    const rows = screen.getAllByRole('listitem')
+    expect(rows).toHaveLength(2)
+    expect(rows[0]).toHaveTextContent('Eighth notes')
+    expect(rows[0]).toHaveTextContent('0:40')
+    expect(rows[1]).toHaveTextContent('Quarter notes')
+    expect(rows[1]).toHaveTextContent('1:00')
+  })
+
   it('discards sessions shorter than 30 seconds', () => {
     render(<App />)
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))

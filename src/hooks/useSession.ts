@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react'
 import { type HistoryEntry, appendEntry, clearHistory, loadHistory } from '../lib/history'
+import type { NoteValue } from '../lib/metronome'
 
 export const MIN_LOGGED_SECONDS = 30
 
 interface Segment {
   bpm: number
+  noteValue: NoteValue
   startedAt: number
 }
 
 /**
- * Stopwatch tied to the metronome transport. Each run at a given BPM is a
- * segment; closing one (stop or BPM change while running) logs it to the
- * persistent history when it lasted at least MIN_LOGGED_SECONDS.
+ * Stopwatch tied to the metronome transport. Each run at a given BPM and
+ * subdivision is a segment; closing one (stop, or a BPM/subdivision change
+ * while running) logs it to the persistent history when it lasted at least
+ * MIN_LOGGED_SECONDS.
  */
 export function useSession() {
   const [history, setHistory] = useState<HistoryEntry[]>(loadHistory)
@@ -28,14 +31,16 @@ export function useSession() {
     const endedAt = Date.now()
     const durationSeconds = Math.floor((endedAt - current.startedAt) / 1000)
     if (durationSeconds >= MIN_LOGGED_SECONDS) {
-      setHistory(appendEntry({ bpm: current.bpm, durationSeconds, endedAt }))
+      setHistory(
+        appendEntry({ bpm: current.bpm, noteValue: current.noteValue, durationSeconds, endedAt }),
+      )
     }
   }
 
-  const start = (bpm: number) => {
+  const start = (bpm: number, noteValue: NoteValue) => {
     const startedAt = Date.now()
     setNow(startedAt)
-    setSegment({ bpm, startedAt })
+    setSegment({ bpm, noteValue, startedAt })
   }
 
   const stop = () => {
@@ -44,10 +49,10 @@ export function useSession() {
     setSegment(null)
   }
 
-  const switchBpm = (bpm: number) => {
-    if (segment === null || bpm === segment.bpm) return
+  const switchSettings = (bpm: number, noteValue: NoteValue) => {
+    if (segment === null || (bpm === segment.bpm && noteValue === segment.noteValue)) return
     closeSegment(segment)
-    start(bpm)
+    start(bpm, noteValue)
   }
 
   const clear = () => {
@@ -57,5 +62,5 @@ export function useSession() {
 
   const elapsedSeconds = segment === null ? 0 : Math.max(0, Math.floor((now - segment.startedAt) / 1000))
 
-  return { history, elapsedSeconds, isRunning: segment !== null, start, stop, switchBpm, clear }
+  return { history, elapsedSeconds, isRunning: segment !== null, start, stop, switchSettings, clear }
 }

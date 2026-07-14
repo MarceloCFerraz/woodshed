@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { type HistoryEntry, appendEntry, clearHistory, loadHistory } from './history'
 
-const entry: HistoryEntry = { bpm: 120, durationSeconds: 754, endedAt: 1770000000000 }
+const entry: HistoryEntry = {
+  bpm: 120,
+  noteValue: 'eighth',
+  durationSeconds: 754,
+  endedAt: 1770000000000,
+}
 
 describe('history storage', () => {
   beforeEach(() => {

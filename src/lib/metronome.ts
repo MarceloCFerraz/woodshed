@@ -18,8 +18,8 @@ export function clampBpm(bpm: number): number {
 const SCHEDULE_AHEAD_S = 0.1
 const LOOKAHEAD_MS = 25
 export const BEAT_FREQ_HZ = 1800
-export const SUBDIVISION_FREQ_HZ = 1100
-const SUBDIVISION_GAIN = 0.45
+export const SUBDIVISION_FREQ_HZ = 850
+const SUBDIVISION_GAIN = 0.28
 const CLICK_DURATION_S = 0.03
 
 /**

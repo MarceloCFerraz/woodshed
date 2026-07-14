@@ -1,7 +1,7 @@
 import { downloadCsv } from '../lib/csv'
 import { formatDuration } from '../lib/formatDuration'
 import type { HistoryEntry } from '../lib/history'
-import { NoteGlyph } from './NoteGlyph'
+import { NOTE_VALUE_META, NoteGlyph } from './NoteGlyph'
 
 interface HistoryListProps {
   entries: HistoryEntry[]
@@ -51,12 +51,21 @@ export function HistoryList({ entries, onClear }: HistoryListProps) {
         </p>
       ) : (
         <ul className="divide-y divide-walnut/10 dark:divide-bone/10">
-          {entries.map((entry) => (
+          {entries.map((entry) => {
+            const subdivision = NOTE_VALUE_META[entry.noteValue ?? 'quarter']
+            return (
             <li key={entry.endedAt} className="flex items-center justify-between py-2.5">
-              <span className="flex items-center gap-1.5 font-medium text-walnut dark:text-bone">
+              <span className="flex w-20 items-center gap-1.5 font-medium text-walnut dark:text-bone">
                 <NoteGlyph flags={0} className="h-4 text-walnut-soft dark:text-bone-soft" />
                 <span className="sr-only">BPM </span>
                 {entry.bpm}
+              </span>
+              <span
+                title={`${subdivision.label} notes`}
+                className="flex items-center text-walnut-soft dark:text-bone-soft"
+              >
+                <NoteGlyph flags={subdivision.flags} className="h-4" />
+                <span className="sr-only">{subdivision.label} notes</span>
               </span>
               <span className="font-mono tabular-nums text-walnut dark:text-bone">
                 {formatDuration(entry.durationSeconds)}
@@ -65,7 +74,8 @@ export function HistoryList({ entries, onClear }: HistoryListProps) {
                 {formatEndedAt(entry.endedAt)}
               </span>
             </li>
-          ))}
+            )
+          })}
         </ul>
       )}
     </section>

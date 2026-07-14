@@ -1,5 +1,9 @@
+import type { NoteValue } from './metronome'
+
 export interface HistoryEntry {
   bpm: number
+  /** Beat subdivision the segment was played with; absent on entries logged before it was tracked. */
+  noteValue?: NoteValue
   durationSeconds: number
   /** Epoch milliseconds of when the segment ended. */
   endedAt: number

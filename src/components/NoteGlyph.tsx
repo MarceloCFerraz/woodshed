@@ -1,3 +1,12 @@
+import type { NoteValue } from '../lib/metronome'
+
+export const NOTE_VALUE_META: Record<NoteValue, { label: string; flags: 0 | 1 | 2 | 3 }> = {
+  quarter: { label: 'Quarter', flags: 0 },
+  eighth: { label: 'Eighth', flags: 1 },
+  sixteenth: { label: 'Sixteenth', flags: 2 },
+  thirtySecond: { label: 'Thirty-second', flags: 3 },
+}
+
 interface NoteGlyphProps {
   /** Number of flags on the stem: 0 = quarter, 1 = eighth, 2 = sixteenth, 3 = thirty-second. */
   flags: 0 | 1 | 2 | 3

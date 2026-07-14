@@ -1,17 +1,15 @@
 import type { NoteValue } from '../lib/metronome'
-import { NoteGlyph } from './NoteGlyph'
+import { NOTE_VALUE_META, NoteGlyph } from './NoteGlyph'
 
 interface NoteValueSelectorProps {
   value: NoteValue
   onChange: (value: NoteValue) => void
 }
 
-const OPTIONS: { value: NoteValue; label: string; flags: 0 | 1 | 2 | 3 }[] = [
-  { value: 'quarter', label: 'Quarter', flags: 0 },
-  { value: 'eighth', label: 'Eighth', flags: 1 },
-  { value: 'sixteenth', label: 'Sixteenth', flags: 2 },
-  { value: 'thirtySecond', label: 'Thirty-second', flags: 3 },
-]
+const OPTIONS = (Object.keys(NOTE_VALUE_META) as NoteValue[]).map((value) => ({
+  value,
+  ...NOTE_VALUE_META[value],
+}))
 
 /** Subdivision of the beat: how many clicks each quarter note gets. */
 export function NoteValueSelector({ value, onChange }: NoteValueSelectorProps) {

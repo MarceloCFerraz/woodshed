@@ -16,7 +16,7 @@ describe('useSession', () => {
 
   it('ticks elapsed seconds while running', () => {
     const { result } = renderHook(() => useSession())
-    act(() => result.current.start(120))
+    act(() => result.current.start(120, 'quarter'))
     act(() => vi.advanceTimersByTime(5_000))
     expect(result.current.elapsedSeconds).toBe(5)
     expect(result.current.isRunning).toBe(true)
@@ -24,11 +24,15 @@ describe('useSession', () => {
 
   it('logs a segment of at least 30s on stop and persists it', () => {
     const { result } = renderHook(() => useSession())
-    act(() => result.current.start(120))
+    act(() => result.current.start(120, 'sixteenth'))
     act(() => vi.advanceTimersByTime(31_000))
     act(() => result.current.stop())
     expect(result.current.history).toHaveLength(1)
-    expect(result.current.history[0]).toMatchObject({ bpm: 120, durationSeconds: 31 })
+    expect(result.current.history[0]).toMatchObject({
+      bpm: 120,
+      noteValue: 'sixteenth',
+      durationSeconds: 31,
+    })
     expect(loadHistory()).toHaveLength(1)
     expect(result.current.isRunning).toBe(false)
     expect(result.current.elapsedSeconds).toBe(0)
@@ -36,7 +40,7 @@ describe('useSession', () => {
 
   it('discards segments shorter than 30s', () => {
     const { result } = renderHook(() => useSession())
-    act(() => result.current.start(120))
+    act(() => result.current.start(120, 'quarter'))
     act(() => vi.advanceTimersByTime(29_000))
     act(() => result.current.stop())
     expect(result.current.history).toHaveLength(0)
@@ -44,9 +48,9 @@ describe('useSession', () => {
 
   it('splits the segment when the bpm changes mid-run', () => {
     const { result } = renderHook(() => useSession())
-    act(() => result.current.start(100))
+    act(() => result.current.start(100, 'quarter'))
     act(() => vi.advanceTimersByTime(40_000))
-    act(() => result.current.switchBpm(110))
+    act(() => result.current.switchSettings(110, 'quarter'))
     expect(result.current.history[0]).toMatchObject({ bpm: 100, durationSeconds: 40 })
     expect(result.current.isRunning).toBe(true)
     expect(result.current.elapsedSeconds).toBe(0)
@@ -56,25 +60,41 @@ describe('useSession', () => {
     expect(result.current.history).toHaveLength(2)
   })
 
-  it('ignores switchBpm to the same bpm', () => {
+  it('splits the segment when the subdivision changes mid-run', () => {
     const { result } = renderHook(() => useSession())
-    act(() => result.current.start(100))
+    act(() => result.current.start(100, 'quarter'))
+    act(() => vi.advanceTimersByTime(45_000))
+    act(() => result.current.switchSettings(100, 'eighth'))
+    expect(result.current.history[0]).toMatchObject({
+      bpm: 100,
+      noteValue: 'quarter',
+      durationSeconds: 45,
+    })
+    act(() => vi.advanceTimersByTime(32_000))
+    act(() => result.current.stop())
+    expect(result.current.history[0]).toMatchObject({ noteValue: 'eighth', durationSeconds: 32 })
+    expect(result.current.history).toHaveLength(2)
+  })
+
+  it('ignores switchSettings with unchanged settings', () => {
+    const { result } = renderHook(() => useSession())
+    act(() => result.current.start(100, 'quarter'))
     act(() => vi.advanceTimersByTime(40_000))
-    act(() => result.current.switchBpm(100))
+    act(() => result.current.switchSettings(100, 'quarter'))
     expect(result.current.history).toHaveLength(0)
     expect(result.current.elapsedSeconds).toBe(40)
   })
 
-  it('ignores switchBpm while stopped', () => {
+  it('ignores switchSettings while stopped', () => {
     const { result } = renderHook(() => useSession())
-    act(() => result.current.switchBpm(140))
+    act(() => result.current.switchSettings(140, 'quarter'))
     expect(result.current.isRunning).toBe(false)
     expect(result.current.history).toHaveLength(0)
   })
 
   it('clears the persisted history', () => {
     const { result } = renderHook(() => useSession())
-    act(() => result.current.start(120))
+    act(() => result.current.start(120, 'quarter'))
     act(() => vi.advanceTimersByTime(31_000))
     act(() => result.current.stop())
     act(() => result.current.clear())
